@@ -1,0 +1,8 @@
+﻿127.0.0.1     reddit.com
+127.0.0.1     www.reddit.com
+
+172.217.175.78       google.com www.google.com
+
+127.0.0.1 localhosts #loopback
+
+#67.225.187.61 liquidweb.com #Liquid Web

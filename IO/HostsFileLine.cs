@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace WSLHostsUpdater.IO;
 
@@ -14,17 +15,26 @@ public class HostsFileLine
 
     public LineType Type { get; protected set; }
     public string RawLine { get; protected set; }
-    public string? TargetAddress { get; protected set; }
-    public string? CommentText { get; protected set; }
-    public List<string> HostNames { get; protected set; }
+    public string? TargetAddress { get; set; }
+    public List<string> HostNames { get; set; }
+    public string? CommentText { get; set; }
 
+    public HostsFileLine(string? targetAddress, List<string>? hostNames)
+    {
+        Type = LineType.RegularEntry;
+        RawLine = "";
+        TargetAddress = targetAddress;
+        HostNames = hostNames ?? new();
+        CommentText = null;
+    }
+    
     protected HostsFileLine(string rawLine)
     {
         Type = LineType.Unknown;
         RawLine = rawLine;
         TargetAddress = null;
-        CommentText = null;
         HostNames = new List<string>();
+        CommentText = null;
     }
 
     public static HostsFileLine Parse(string lineText)
@@ -112,5 +122,32 @@ public class HostsFileLine
         }
 
         return result;
+    }
+
+    public override string ToString()
+    {
+        if (Type != LineType.RegularEntry)
+            return RawLine;
+
+        var result = new StringBuilder();
+        
+        if (TargetAddress != null)
+            result.Append(TargetAddress);
+        result.Append("\t");
+        
+        for (var i = 0; i < HostNames.Count; i++)
+        {
+            if (i > 0)
+                result.Append(' ');
+            result.Append(HostNames[i]);
+        }
+
+        if (!String.IsNullOrEmpty(CommentText))
+        {
+            result.Append("\t# ");
+            result.Append(CommentText);
+        }
+
+        return result.ToString();
     }
 }

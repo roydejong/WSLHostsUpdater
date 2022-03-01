@@ -83,7 +83,7 @@ public class WslInterface
         }
         catch (Exception ex)
         {
-            _logger.LogError("[WSL] Execute failed");
+            _logger.LogError("[WSL] Execute failed: {Ex}", ex);
         }
         
         return null;

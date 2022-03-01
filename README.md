@@ -11,9 +11,16 @@
 
 ✅ [**Download the latest build from GitHub**](https://github.com/roydejong/WSLHostsUpdater/releases/latest) (or build from source if you prefer)
 
-Place the files in a permanent installation directory.
+You can either run the program manually, or install it as a Windows Service. Either way, you'll need administrator permissions so the `hosts` file can be edited.
 
-Install `WSLHostsUpdater.exe` as a Windows Service, and configure it to run under your user account credentials.
+### Service installation
+Place the files in a permanent directory, then use `sc` on the command line to install the Windows service:
+
+```
+sc.exe create "WSLHostsUpdater" binpath="<SET_YOUR_INSTALL_PATH>\WSLHostsUpdater.exe" start=delayed-auto obj=<SET_YOUR_WINDOWS_ACCOUNT> password=<SET_YOUR_WINDOWS_PASSWORD>
+```
+
+After this, you'll be able to see and manage the service from the Windows Services view. Warnings and errors will appear in the event viewer with `WSLHostsUpdater` as source.
 
 ## Configuration
 You can modify `appsettings.json` to configure some aspects of the service:

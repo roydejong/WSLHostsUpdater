@@ -31,7 +31,6 @@ public class WslInterface
             }
         }
 
-        _logger.LogWarning("are you kitten me");
         return false;
     }
     

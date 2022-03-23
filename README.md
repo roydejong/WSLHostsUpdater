@@ -23,7 +23,7 @@ sc.exe create "WSLHostsUpdater" binpath="<SET_YOUR_INSTALL_PATH>\WSLHostsUpdater
 After this, you'll be able to see and manage the service from the Windows Services view. Warnings and errors will appear in the event viewer with `WSLHostsUpdater` as source.
 
 ## Configuration
-You can modify `appsettings.json` to configure some aspects of the service:
+You can modify `appsettings.json` (must be in the same directory as the executable) to configure some aspects of the service:
 
 ```json
 {
@@ -46,3 +46,5 @@ You can modify `appsettings.json` to configure some aspects of the service:
 | `CheckWslRunning` | If true, check if WSL is running first before attempting to refresh. | `true`                        |
 | `UpdateInterval`  | The amount of time in milliseconds between refreshes.                | `30000` (30 seconds)          |
 | `Hostnames`       | Array of host names to update in the `hosts` file.                   | `["wsl.local", "ubuntu.wsl"]` |
+
+🕑 The configuration file is hot reloaded automatically, so you can add hostnames whenever you like without having to restart the service.

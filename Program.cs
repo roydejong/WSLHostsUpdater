@@ -1,12 +1,17 @@
 using WSLHostsUpdater;
-using Microsoft.Extensions.Hosting.WindowsServices;
+
+var binPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, AppDomain.CurrentDomain.RelativeSearchPath ?? "");
 
 IHost host = Host.CreateDefaultBuilder(args)
     .UseWindowsService()
     .ConfigureLogging(loggerFactory => loggerFactory.AddEventLog())
-    .ConfigureServices(services =>
+    .ConfigureServices(services => { services.AddHostedService<Worker>(); })
+    .ConfigureAppConfiguration(config =>
     {
-        services.AddHostedService<Worker>();
+        // Load appsettings.json from the executable path, and automatically reload it on change
+        config.SetBasePath(binPath);
+        config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+        config.AddEnvironmentVariables();
     })
     .Build();
 

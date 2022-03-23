@@ -66,22 +66,29 @@ public class Worker : BackgroundService
             return false;
         }
         
-        // Update hosts file
+        // Stage changes
         foreach (var hostName in ConfigHostnames)
         {
             hostsFile.AddOrUpdate(hostName, ipAddress.ToString());
         }
 
-        if (hostsFile.DirtyFlag)
-        {
-            _logger.LogInformation("Updated hosts file successfully");
-            hostsFile.Save();
-        }
-        else
+        // Write hosts file if any changes were detected
+        if (!hostsFile.DirtyFlag)
         {
             _logger.LogDebug("No changes detected");
+            return true;
         }
 
-        return true;
+        try
+        {
+            hostsFile.Save();
+            _logger.LogInformation("Updated hosts file successfully");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("Failed to update hosts file: {Exception}", ex);
+            return false;
+        }
     }
 }

@@ -5,6 +5,20 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <UserSecretsId>dotnet-WSLHostsUpdater-28EE3121-6324-4E18-8B0D-99AF188526CD</UserSecretsId>
+        <ApplicationIcon>tux.ico</ApplicationIcon>
+        <AssemblyVersion>1.0.0</AssemblyVersion>
+        <FileVersion>1.0.0</FileVersion>
+        <NeutralLanguage>en-US</NeutralLanguage>
+        <PackageVersion>1.0.0-beta2</PackageVersion>
+        <Title>WSL Hosts Updater</Title>
+        <Authors>Roy de Jong</Authors>
+        <Description>Windows service that automatically manages hosts entries for your Windows Subsystem for Linux (WSL) instance.</Description>
+        <Copyright>Copyright (c) 2022 Roy de Jong</Copyright>
+        <PackageProjectUrl>https://github.com/roydejong/WSLHostsUpdater</PackageProjectUrl>
+        <PackageLicenseUrl>https://github.com/roydejong/WSLHostsUpdater/blob/main/LICENSE</PackageLicenseUrl>
+        <RepositoryUrl>https://github.com/roydejong/WSLHostsUpdater</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>windows service hosts wsl wsl-ubuntu wsl2</PackageTags>
     </PropertyGroup>
 
     <ItemGroup>

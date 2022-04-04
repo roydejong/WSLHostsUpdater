@@ -5,7 +5,7 @@
 - Lightweight Windows service
 - Periodically checks your default WSL instance's status and IP
 - Automatically updates `hosts` entries with the instance's IP address
-- Keeps your hosts file clean and only ever adds one line
+- Keeps your hosts file clean and only ever adds one line per host
 
 ## Installation
 

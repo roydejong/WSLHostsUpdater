@@ -68,17 +68,9 @@ public class Worker : BackgroundService
         
         // Stage changes
         foreach (var hostName in ConfigHostnames)
-        {
-            hostsFile.AddOrUpdate(hostName, ipAddress.ToString());
-        }
+            hostsFile.StageManagedLine(hostName, ipAddress.ToString());
 
-        // Write hosts file if any changes were detected
-        if (!hostsFile.DirtyFlag)
-        {
-            _logger.LogDebug("No changes detected");
-            return true;
-        }
-
+        // Write hosts file
         try
         {
             hostsFile.Save();

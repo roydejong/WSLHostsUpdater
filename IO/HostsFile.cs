@@ -8,19 +8,19 @@ public class HostsFile
     
     private string _rawContents;
     private Dictionary<string, string> _hostMap;
-    private HostsFileLine? _managedLine;
-        
+    private List<HostsFileLine> _managedLines;
+    private Dictionary<string, string> _stagedEntries;
+
     public List<HostsFileLine> Lines { get; protected set; }
-    public bool DirtyFlag { get; protected set; }
 
     protected HostsFile(string fileContents)
     {
         _rawContents = fileContents;
         _hostMap = new();
-        _managedLine = null;
+        _managedLines = new();
+        _stagedEntries = new();
         
         Lines = new();
-        DirtyFlag = false;
     }
 
     protected void Parse()
@@ -43,11 +43,9 @@ public class HostsFile
 
             if (parsedLine.CommentText == MarkerCommentText)
             {
-                _managedLine = parsedLine;
+                _managedLines.Add(parsedLine);
             }
         }
-        
-        DirtyFlag = false;
     }
 
     #region Read API
@@ -56,54 +54,40 @@ public class HostsFile
         return _hostMap.TryGetValue(hostName.ToLowerInvariant(), out var result) ? result : null;
     }
 
-    public void AddOrUpdate(string hostName, string targetAddress)
+    public void StageManagedLine(string hostName, string targetAddress)
     {
-        if (_managedLine == null)
-        {
-            _managedLine = new HostsFileLine(targetAddress, new List<string>() {hostName});
-            Lines.Add(_managedLine);
-            DirtyFlag = true;
-        }
-        else
-        {
-            if (!_managedLine.HostNames.Contains(hostName))
-            {
-                _managedLine.HostNames.Add(hostName);
-                DirtyFlag = true;
-            }
-
-            if (_managedLine.TargetAddress != targetAddress)
-            {
-                _managedLine.TargetAddress = targetAddress;
-                DirtyFlag = true;
-            }
-        }
-
-        _managedLine.CommentText = MarkerCommentText;
-        
-        // Remove any duplicate lines for this host
-        Lines.RemoveAll(line => line.Type == HostsFileLine.LineType.RegularEntry
-                                && line.CommentText != MarkerCommentText
-                                && line.HostNames.Contains(hostName));
+        _stagedEntries[hostName] = targetAddress;
     }
     #endregion
 
     #region Write API
+
+    private List<HostsFileLine> GenerateManagedLines()
+    {
+        return _stagedEntries.Select(entry => 
+            new HostsFileLine(entry.Value, new List<string>() {entry.Key}, MarkerCommentText))
+            .ToList();
+    }
+    
     public void Save()
     {
-        if (!DirtyFlag)
-            return;
-
         var output = new StringBuilder();
 
+        // Insert original host file lines
         foreach (var line in Lines)
         {
-            if (line == _managedLine)
-                output.AppendLine(line.ToString());
-            else
-                output.AppendLine(line.RawLine);
-        }
+            if (_managedLines.Contains(line))
+                // Managed lines need to be fully rebuilt
+                continue;
 
+            output.AppendLine(line.RawLine);
+        }
+        
+        // (Re)generate and insert managed lines
+        foreach (var line in GenerateManagedLines())
+            output.AppendLine(line.ToString());
+
+        // Write out
         File.WriteAllText(GetFilePath(), output.ToString().Trim());
     }
     #endregion

@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using System.Text;
+﻿using System.Text;
 
 namespace WSLHostsUpdater.IO;
 
@@ -19,13 +18,13 @@ public class HostsFileLine
     public List<string> HostNames { get; set; }
     public string? CommentText { get; set; }
 
-    public HostsFileLine(string? targetAddress, List<string>? hostNames)
+    public HostsFileLine(string? targetAddress, List<string>? hostNames, string? commentText = null)
     {
         Type = LineType.RegularEntry;
         RawLine = "";
         TargetAddress = targetAddress;
         HostNames = hostNames ?? new();
-        CommentText = null;
+        CommentText = commentText;
     }
     
     protected HostsFileLine(string rawLine)

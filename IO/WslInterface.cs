@@ -77,7 +77,7 @@ public class WslInterface
             {
                 var stdOut = await process.StandardOutput.ReadToEndAsync();
                 stdOut = stdOut.Replace("\0", string.Empty); // remove null bytes (why are they here??)
-                return stdOut;
+                return stdOut.Trim();
             }
         }
         catch (Exception ex)

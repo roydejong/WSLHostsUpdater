@@ -4,7 +4,10 @@ var binPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, AppDomain.Curr
 
 IHost host = Host.CreateDefaultBuilder(args)
     .UseWindowsService()
-    .ConfigureLogging(loggerFactory => loggerFactory.AddEventLog())
+    .ConfigureLogging(loggerFactory =>
+    {
+        loggerFactory.AddEventLog();
+    })
     .ConfigureServices(services => { services.AddHostedService<Worker>(); })
     .ConfigureAppConfiguration(config =>
     {

@@ -49,7 +49,7 @@ public class WslInterface
 
     internal async Task<string?> Execute(string args)
     {
-        var psi = new ProcessStartInfo("wsl", args);
+        var psi = new ProcessStartInfo(@"C:\Windows\system32\wsl.exe", args);
         psi.RedirectStandardOutput = true;
         psi.StandardOutputEncoding = Encoding.UTF8;
         psi.RedirectStandardError = true;
@@ -73,7 +73,7 @@ public class WslInterface
             var haveStdErr = !string.IsNullOrEmpty(stdErr);
             var haveStdOut = !string.IsNullOrEmpty(stdOut);
 
-            if (haveStdErr || !haveStdErr)
+            if (haveStdErr || !haveStdOut)
             {
                 _logger.LogWarning("[WSL] WSL Interface did not get a result, or got stderr, details:\r\n" +
                                    " • Command executed: \"wsl {Args}\"\r\n" +

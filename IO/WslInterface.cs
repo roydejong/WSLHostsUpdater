@@ -27,20 +27,20 @@ public class WslInterface
             if (line.StartsWith('*'))
             {
                 // Default instance, this is what we're looking for
-                return line.Contains("Running"); 
+                return line.Contains("Running");
             }
         }
 
         return false;
     }
-    
+
     public async Task<IPAddress?> TryGetAddress()
     {
         var result = await Execute("hostname -I");
 
         if (result is null)
             return null;
-        
+
         if (IPAddress.TryParse(result.Trim(), out var ipAddress))
             return ipAddress;
 
@@ -62,29 +62,50 @@ public class WslInterface
             var process = new Process();
             process.StartInfo = psi;
             process.Start();
-            
+
             _logger.LogDebug("[WSL] Execute: wsl {Args}", args);
 
             await process.WaitForExitAsync();
-            
-            if (process.StandardError.Peek() > -1)
+
+            var stdErr = await TryReadCleanStd(process.StandardError);
+            var stdOut = await TryReadCleanStd(process.StandardOutput);
+
+            var haveStdErr = !string.IsNullOrEmpty(stdErr);
+            var haveStdOut = !string.IsNullOrEmpty(stdOut);
+
+            if (haveStdErr || !haveStdErr)
             {
-                var stderr = await process.StandardError.ReadToEndAsync();
-                _logger.LogWarning("[WSL] stderr: {Text}", stderr);
+                _logger.LogWarning("[WSL] WSL Interface did not get a result, or got stderr, details:\r\n" +
+                                   " • Command executed: \"wsl {Args}\"\r\n" +
+                                   " • Result from stdout: \"{StdOut}\"\r\n" +
+                                   " • Result from stderr: \"{StdErr}\"",
+                    args, stdOut, stdErr);
             }
 
-            if (process.StandardOutput.Peek() > -1)
+            if (haveStdOut)
             {
-                var stdOut = await process.StandardOutput.ReadToEndAsync();
-                stdOut = stdOut.Replace("\0", string.Empty); // remove null bytes (why are they here??)
-                return stdOut.Trim();
+                return stdOut;
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError("[WSL] Execute failed: {Ex}", ex);
+            _logger.LogError("[WSL] WSL Interface execute failed: {Ex}", ex);
         }
-        
+
         return null;
+    }
+
+    private static async Task<string?> TryReadCleanStd(StreamReader reader)
+    {
+        if (reader.Peek() == -1)
+            return null;
+
+        var stdStr = await reader.ReadToEndAsync();
+
+        // Remove null bytes that may appear
+        stdStr = stdStr.Replace("\0", string.Empty);
+
+        // Remove excess newlines that may appear
+        return stdStr.Trim();
     }
 }
